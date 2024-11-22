@@ -35,7 +35,7 @@ export default function NavBar() {
                 <Link className="btn" href={""}>
                   Tableau de bord
                 </Link>
-                <Link className="btn" href={""}>
+                <Link className="btn" href={"/transactions"}>
                   Mes Transaction
                 </Link>
               </div>
@@ -50,7 +50,7 @@ export default function NavBar() {
               <Link className="btn btn-sm" href={""}>
                 Tableau de bord
               </Link>
-              <Link className="btn btn-sm" href={""}>
+              <Link className="btn btn-sm" href={"/transactions"}>
                 Mes Transaction
               </Link>
             </div>

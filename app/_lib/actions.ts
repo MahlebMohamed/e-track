@@ -160,32 +160,29 @@ export async function getTransactionsByEmailAndPeriod(
   email: string,
   period: string,
 ) {
-  const now = new Date();
-  let dataLimit;
-
   try {
+    const now = new Date();
+    let dateLimit;
+
     switch (period) {
-      case "last7":
-        dataLimit = new Date(now);
-        dataLimit.setDate(now.getDate() - 7);
-        break;
       case "last30":
-        dataLimit = new Date(now);
-        dataLimit.setDate(now.getDate() - 30);
+        dateLimit = new Date(now);
+        dateLimit.setDate(now.getDate() - 30);
         break;
-
       case "last90":
-        dataLimit = new Date(now);
-        dataLimit.setDate(now.getDate() - 90);
+        dateLimit = new Date(now);
+        dateLimit.setDate(now.getDate() - 90);
         break;
-
+      case "last7":
+        dateLimit = new Date(now);
+        dateLimit.setDate(now.getDate() - 7);
+        break;
       case "last365":
-        dataLimit = new Date(now);
-        dataLimit.setDate(now.getDate() - 365);
+        dateLimit = new Date(now);
+        dateLimit.setFullYear(now.getFullYear() - 1);
         break;
-
       default:
-        throw new Error("Period not found");
+        throw new Error("Période invalide.");
     }
 
     const user = await prisma.user.findUnique({
@@ -196,7 +193,7 @@ export async function getTransactionsByEmailAndPeriod(
             transactions: {
               where: {
                 createdAt: {
-                  gte: dataLimit,
+                  gte: dateLimit,
                 },
               },
               orderBy: {
@@ -208,17 +205,21 @@ export async function getTransactionsByEmailAndPeriod(
       },
     });
 
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      throw new Error("Utilisateur non trouvé.");
+    }
 
-    const transactions = await user.budget.flatMap((budget) => {
-      budget.transactions.map((transaction) => ({
+    const transactions = user.budget.flatMap((budjet) =>
+      budjet.transactions.map((transaction) => ({
         ...transaction,
-        budgetName: budget.name,
-      }));
-    });
+        budgetName: budjet.name,
+        budgetId: budjet.id,
+      })),
+    );
 
     return transactions;
   } catch (error) {
-    console.log(error);
+    console.error("Erreur lors de la récupération des transactions:", error);
+    throw error;
   }
 }
