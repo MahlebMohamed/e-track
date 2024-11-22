@@ -2,9 +2,19 @@
 
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { useEffect } from "react";
+import { checkAndAddUser } from "../_lib/actions";
 
 export default function NavBar() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
+
+  useEffect(
+    function () {
+      if (user?.primaryEmailAddress?.emailAddress)
+        checkAndAddUser(user?.primaryEmailAddress?.emailAddress);
+    },
+    [user],
+  );
 
   return (
     <nav className="bg-base-300/30 px-5 py-4 md:px-[10%] md:py-6">
@@ -12,12 +22,14 @@ export default function NavBar() {
         (isSignedIn ? (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">
-                e <span className="text-accent">track</span>
-              </h1>
+              <Link href={"/"}>
+                <h1 className="text-2xl font-bold">
+                  e <span className="text-accent">track</span>
+                </h1>
+              </Link>
 
               <div className="hidden items-center justify-center gap-8 md:flex">
-                <Link className="btn" href={""}>
+                <Link className="btn" href={"/budjets"}>
                   Mes Budjets
                 </Link>
                 <Link className="btn" href={""}>
